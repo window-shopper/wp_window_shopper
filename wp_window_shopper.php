@@ -39,9 +39,9 @@ define( 'WP_Window_Shopper_VERSION', '1.0.0' );
 // Admin Page
 add_action('admin_menu', 'my_wpws_menu');
 function my_wpws_menu() {
-  add_menu_page('WP Window Shopper', 'Window Shopper', 'manage_options', 'wp-window-shopper', 'wpws___admin_index', 'dashicons-cart');
+  add_menu_page('WP Window Shopper', 'Window Shopper', 'manage_options', 'wp-window-shopper', 'wpws__admin_index', 'dashicons-cart');
 }
-function wpws___admin_index() {
+function wpws__admin_index() {
   $x = wp_localize_script( '', 'WP_API_Settings', array(
     'endpoint' => esc_url_raw( rest_url() ),
     'nonce' => wp_create_nonce( 'wp_rest' )
@@ -83,64 +83,64 @@ $wpws_create_categories_table = "CREATE TABLE $wpws_categories_table_name (
 ) $wpws_charset_collate;";
 dbDelta( $wpws_create_categories_table );
 
-function db___getProductBoxByID($ID) {
+function wpws__DBgetProductBoxByID($ID) {
   global $wpdb;
   $result = $wpdb->get_results("SELECT json from wp_wpws_product_boxes WHERE id =" . $ID);
   return $result[0]->json;
 }
-function db___getTemplateByID($ID) {
+function wpws__DBgetTemplateByID($ID) {
   global $wpdb;
   $result = $wpdb->get_results("SELECT json from wp_wpws_templates WHERE id =" . $ID);
   return $result[0]->json;
 }
-function db___getCategories() {
+function wpws__DBgetCategories() {
   global $wpdb;
   $results = $wpdb->get_results("SELECT * from wp_wpws_categories");
   return $results;
 }
-function db___getProductBoxes() {
+function wpws__DBgetProductBoxes() {
   global $wpdb;
   $results = $wpdb->get_results("SELECT json from wp_wpws_product_boxes");
   return $results;
 }
-function db___getTemplates() {
+function wpws__DBgetTemplates() {
   global $wpdb;
   $results = $wpdb->get_results("SELECT json from wp_wpws_templates");
   return $results;
 }
-function db___postCategory($categoryName) {
+function wpws__DBpostCategory($categoryName) {
   global $wpdb;
   $wpdb->insert("wp_wpws_categories", array("category" => $categoryName), array("%s"));
 }
-function db___postProductBox($productBoxJSON) {
+function wpws__DBpostProductBox($productBoxJSON) {
   global $wpdb;
   $wpdb->insert("wp_wpws_product_boxes", array("json" => $productBoxJSON), array("%s"));
   $lastid = $wpdb->insert_id;
   return $lastid;
 }
-function db___postTemplate($templateJSON) {
+function wpws__DBpostTemplate($templateJSON) {
   global $wpdb;
   $wpdb->insert("wp_wpws_templates", array("json" => $templateJSON), array("%s"));
   $lastid = $wpdb->insert_id;
   return $lastid;
 }
-function db___patchProductBox($productBox) {
+function wpws__DBpatchProductBox($productBox) {
   global $wpdb;
   $wpdb->update("wp_wpws_product_boxes", array("json" => json_encode($productBox)), array("id" => $productBox->productBoxID), array("%s"));
 }
-function db___patchTemplate($template) {
+function wpws__DBpatchTemplate($template) {
   global $wpdb;
   $wpdb->update("wp_wpws_templates", array("json" => json_encode($template)), array("id" => $template->templateID), array("%s"));
 }
-function db___deleteProductBox($ID) {
+function wpws__DBdeleteProductBox($ID) {
   global $wpdb;
   $wpdb->delete("wp_wpws_product_boxes", array("id" => $ID));
 }
-function db___deleteTemplate($ID) {
+function wpws__DBdeleteTemplate($ID) {
   global $wpdb;
   $wpdb->delete("wp_wpws_templates", array("id" => $ID));
 }
-function db___deleteCategory($ID) {
+function wpws__DBdeleteCategory($ID) {
   global $wpdb;
   $wpdb->delete("wp_wpws_categories", array("id" => $ID));
 }
@@ -148,31 +148,31 @@ function db___deleteCategory($ID) {
 // REST API init
 add_action('rest_api_init', 'register_routes');
 
-function handle___getProductBox($request) {
+function wpws__handle_getProductBox($request) {
   $ID = $request["id"];
-  $productBox = db___getProductBoxByID($ID);
+  $productBox = wpws__DBgetProductBoxByID($ID);
   return rest_ensure_response(json_decode($productBox));
 }
-function handle___getTemplate($request) {
+function wpws__handle_getTemplate($request) {
   $ID = $request["id"];
-  $template = db___getTemplateByID($ID);
+  $template = wpws__DBgetTemplateByID($ID);
   return rest_ensure_response(json_decode($template));
 }
-function handle___getCategories() {
-  $results = db___getCategories();
+function wpws__handle_getCategories() {
+  $results = wpws__DBgetCategories();
   return rest_ensure_response($results);
 }
-function handle___getProductBoxes() {
-  $results = db___getProductBoxes();
+function wpws__handle_getProductBoxes() {
+  $results = wpws__DBgetProductBoxes();
   $productBoxes = array();
   foreach($results as $result) {
     array_push($productBoxes, json_decode($result->json));  
   }
   return rest_ensure_response($productBoxes);
 }
-function handle___getProductBoxesByTemplateID($request) {
+function wpws__handle_getProductBoxesByTemplateID($request) {
   $templateID = $request["id"];
-  $results = db___getProductBoxes();
+  $results = wpws__DBgetProductBoxes();
   $productBoxes = array();
   foreach($results as $result) {
     $productBox = json_decode($result->json);
@@ -182,70 +182,70 @@ function handle___getProductBoxesByTemplateID($request) {
   }
   return rest_ensure_response($productBoxes);
 }
-function handle___getTemplates() {
-  $results = db___getTemplates();
+function wpws__handle_getTemplates() {
+  $results = wpws__DBgetTemplates();
   $templates = array();
   foreach($results as $result) {
     array_push($templates, json_decode($result->json));  
   }
   return rest_ensure_response($templates);
 }
-function handle___postCategory($request) {
+function wpws__handle_postCategory($request) {
   $body = json_decode($request->get_body());
-  db___postCategory($body->category);
+  wpws__DBpostCategory($body->category);
   return rest_ensure_response(json_encode($body));
 }
-function handle___postProductBox($request) {
+function wpws__handle_postProductBox($request) {
   $body = $request->get_body();
-  $id = db___postProductBox($body);
+  $id = wpws__DBpostProductBox($body);
   $productBox = json_decode($body);
   $productBox->productBoxID = strval($id);
-  db___patchProductBox($productBox);
+  wpws__DBpatchProductBox($productBox);
   return rest_ensure_response($productBox);
 }
-function handle___postTemplate($request) {
+function wpws__handle_postTemplate($request) {
   $body = $request->get_body();
-  $id = db___postTemplate($body);
+  $id = wpws__DBpostTemplate($body);
   $template = json_decode($body);
   $template->templateID = strval($id);
-  db___patchTemplate($template);
+  wpws__DBpatchTemplate($template);
   return rest_ensure_response($template);
 }
-function handle___patchProductBoxes($request) {
+function wpws__handle_patchProductBoxes($request) {
   $body = json_decode($request->get_body());
   foreach($body as $productBox) {
-    db___patchProductBox($productBox);
+    wpws__DBpatchProductBox($productBox);
   }
   return rest_ensure_response($request->get_body());
 }
-function handle___patchProductBox($request) {
+function wpws__handle_patchProductBox($request) {
   $productBox = json_decode($request->get_body());
-  db___patchProductBox($productBox);
+  wpws__DBpatchProductBox($productBox);
   return rest_ensure_response($request->get_body());
 }
-function handle___patchTemplate($request) {
+function wpws__handle_patchTemplate($request) {
   $template = json_decode($request->get_body());
-  db___patchTemplate($template);
+  wpws__DBpatchTemplate($template);
   return rest_ensure_response($request->get_body());
 }
-function handle___deleteProductBox($request) {
+function wpws__handle_deleteProductBox($request) {
   $ID = $request["id"];
-  $productBox = db___getProductBoxByID($ID);
-  db___deleteProductBox($ID);
+  $productBox = wpws__DBgetProductBoxByID($ID);
+  wpws__DBdeleteProductBox($ID);
   return rest_ensure_response(json_decode($productBox));
 }
-function handle___deleteTemplate($request) {
+function wpws__handle_deleteTemplate($request) {
   $ID = $request["id"];
-  $template = db___getTemplateByID($ID);
-  db___deleteTemplate($ID);
+  $template = wpws__DBgetTemplateByID($ID);
+  wpws__DBdeleteTemplate($ID);
   return rest_ensure_response(json_decode($template));
 }
-function handle___deleteCategory($request) {
+function wpws__handle_deleteCategory($request) {
   $id = $request["id"];
-  db___deleteCategory($id);
+  wpws__DBdeleteCategory($id);
   return rest_ensure_response($request->get_body());
 }
-function wpws___get_images_from_media_library() {
+function wpws__get_images_from_media_library() {
     $args = array(
         'post_type' => 'attachment',
         'post_mime_type' =>'image',
@@ -266,106 +266,106 @@ function wpws___get_images_from_media_library() {
     }
     return $images;
 }
-function handle___getImages($request) {
-  return rest_ensure_response(wpws___get_images_from_media_library());
+function wpws__handle_getImages($request) {
+  return rest_ensure_response(wpws__get_images_from_media_library());
 }
 
-function wpws___permission_callback () {
+function wpws__permission_callback () {
   return current_user_can( 'edit_others_posts' );
 }
 
 function register_routes() {
   register_rest_route( 'wpws/v1', '/productbox/(?P<id>\d+)', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getProductBox',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getProductBox',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/template/(?P<id>\d+)', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getTemplate',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getTemplate',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/categories', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getCategories',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getCategories',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productboxes', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getProductBoxes',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getProductBoxes',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productboxes/(?P<id>\d+)', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getProductBoxesByTemplateID',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getProductBoxesByTemplateID',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/templates', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getTemplates',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getTemplates',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/category', array(
     'methods'  => 'POST',
-    'callback' => 'handle___postCategory',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_postCategory',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productboxes', array(
     'methods'  => 'PUT',
-    'callback' => 'handle___patchProductBoxes',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_patchProductBoxes',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productbox', array(
     'methods'  => 'POST',
-    'callback' => 'handle___postProductBox',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_postProductBox',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/template', array(
     'methods'  => 'POST',
-    'callback' => 'handle___postTemplate',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_postTemplate',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productbox', array(
     'methods'  => 'PUT',
-    'callback' => 'handle___patchProductBox',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_patchProductBox',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/template', array(
     'methods'  => 'PUT',
-    'callback' => 'handle___patchTemplate',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_patchTemplate',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/productbox/(?P<id>\d+)', array(
     'methods'  => 'DELETE',
-    'callback' => 'handle___deleteProductBox',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_deleteProductBox',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/template/(?P<id>\d+)', array(
     'methods'  => 'DELETE',
-    'callback' => 'handle___deleteTemplate',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_deleteTemplate',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/category/(?P<id>\d+)', array(
     'methods'  => 'DELETE',
-    'callback' => 'handle___deleteCategory',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_deleteCategory',
+    'permission_callback' => 'wpws__permission_callback',
   ));
   register_rest_route( 'wpws/v1', '/images', array(
     'methods'  => 'GET',
-    'callback' => 'handle___getImages',
-    'permission_callback' => 'wpws___permission_callback',
+    'callback' => 'wpws__handle_getImages',
+    'permission_callback' => 'wpws__permission_callback',
   ));
 }
 
-add_action('init', 'wpws___register_shortcodes_from_product_boxes');
-function wpws___add_product_box_shortcode($atts, $content) {
+add_action('init', 'wpws__register_shortcodes_from_product_boxes');
+function wpws__add_product_box_shortcode($atts, $content) {
   $atts = shortcode_atts(
     array(
         'id' => '1',
         'ids' => '',
     ), $atts);
   if (strlen($atts["ids"]) == 0) {
-    $json = db___getProductBoxByID($atts["id"]);
+    $json = wpws__DBgetProductBoxByID($atts["id"]);
     $productBox = json_decode($json);
     return $productBox->innerHTML;
   } else {
@@ -373,7 +373,7 @@ function wpws___add_product_box_shortcode($atts, $content) {
     $boxes_html = "";
     $i = 0;
     foreach($ids as $id) {
-      $json = db___getProductBoxByID($id);
+      $json = wpws__DBgetProductBoxByID($id);
       $productBox = json_decode($json);
       $box_html = $productBox->innerHTML;
       $boxes_html = $boxes_html . $box_html;
@@ -382,7 +382,7 @@ function wpws___add_product_box_shortcode($atts, $content) {
     return '<div style="display: flex; flex-wrap: wrap; align-items: stretch;">' . $boxes_html . '</div>'; 
   }
 }
-function wpws___register_shortcodes_from_product_boxes(){
-  add_shortcode("wpws", "wpws___add_product_box_shortcode");
+function wpws__register_shortcodes_from_product_boxes(){
+  add_shortcode("wpws", "wpws__add_product_box_shortcode");
 }
 
