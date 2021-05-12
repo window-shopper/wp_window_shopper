@@ -16,7 +16,7 @@
     "deep-object-diff": "^1.1.0",
     "fuzzy-search": "^3.2.1",
     "material-ui-color-picker": "^3.5.0",
-    "merge": "^1.2.1",
+    "merge": "^2.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-fetching-library": "^1.7.4",
